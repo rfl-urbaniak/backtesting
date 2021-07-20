@@ -17,11 +17,7 @@ library(TTR)
 #library(xts)
 ```
 
-Next, get the most recent data on US500 (because I’ll use it for the
-example), rename the columns for later use, take a peek, check how many
-days have been recorded, rename the wole dataset as `US500full`, pick
-the first 2800 days for training and optimization (call it `US500`) and
-keep the remaining dates for testing as `US500test`.
+Next, get the most recent data on US500 (because I'll use it for the example), rename the columns for later use, take a peek, check how many days have been recorded, rename the wole dataset as `US500full`, pick the first 2800 days for training and optimization (call it `US500`) and keep the remaining dates for testing as `US500test`.
 
 ``` r
 getSymbols(Symbols = "^GSPC", src = "yahoo")
@@ -47,7 +43,7 @@ head(US500)
 nrow(US500)
 ```
 
-    ## [1] 3621
+    ## [1] 3661
 
 ``` r
 US500full <- US500
@@ -57,14 +53,7 @@ US500test <- US500full[2801:nrow(US500full),]
 
 ### Adding returns (and being a bit fussy about it)
 
-Normally, to add daily returns one might do so using the closing prices.
-However, notice that for strategy evaluation this might be misleading,
-as you are unlikely to be able to buy or sell exactly at the closing
-price (and you definitely won’t be able to use a strategy deciding to
-sell based on a closing price that do not exist yet, so you can’t sell
-right before the closing). So instead, we’ll be using the open prices.
-As a sanity check, we first do calculate close-based returns just to see
-that there is a difference later on.
+Normally, to add daily returns one might do so using the closing prices. However, notice that for strategy evaluation this might be misleading, as you are unlikely to be able to buy or sell exactly at the closing price (and you definitely won't be able to use a strategy deciding to sell based on a closing price that do not exist yet, so you can't sell right before the closing). So instead, we'll be using the open prices. As a sanity check, we first do calculate close-based returns just to see that there is a difference later on.
 
 ``` r
 US500$closeRet <- numeric(nrow(US500))
@@ -100,17 +89,7 @@ head(US500)
 
 ### Building signal
 
-Say you want to try out a fairly straightforward strategy, a variant of
-Bollinger bands. The idea is to buy if the price enters
-\(ma\)-\(multiplier\times runSD\) from below, that is if crosses some
-multiplier of the running standard deviation down from the moving
-average. Suppose you’re using the same time window to calculate them
-both. Further, assume you want to sell when the price reaches \(ma\),
-and that you’re only interested in long positions, that is the signal is
-binary: 1 for holding a long position, 0 for not being on the market.
-Because we want to reuse the code to define a general function, it will
-be useful to rename the data as `data` for the time being. Suppose you
-think 20 days is good and that 1.5 is a decent multiplier.
+Say you want to try out a fairly straightforward strategy, a variant of Bollinger bands. The idea is to buy if the price enters *m**a*-*m**u**l**t**i**p**l**i**e**r* × *r**u**n**S**D* from below, that is if crosses some multiplier of the running standard deviation down from the moving average. Suppose you're using the same time window to calculate them both. Further, assume you want to sell when the price reaches *m**a*, and that you're only interested in long positions, that is the signal is binary: 1 for holding a long position, 0 for not being on the market. Because we want to reuse the code to define a general function, it will be useful to rename the data as `data` for the time being. Suppose you think 20 days is good and that 1.5 is a decent multiplier.
 
 ``` r
 #this depends on two parameters
@@ -134,8 +113,7 @@ for (i in (lookback + 2):nrow(data)){
     }
 ```
 
-For later use, it actually makes to define a function that does all this
-at once.
+For later use, it actually makes to define a function that does all this at once.
 
 ``` r
 signal <- function (data, lookback = 20, multiplier = 1.5) { 
@@ -154,11 +132,9 @@ return(data)
 US500withSignal <- signal(US500)
 ```
 
-# Don’t just annualize expected daily returns
+# Don't just annualize expected daily returns
 
-Now, you might think, ok, let’s just pick the close-based returns for
-the days on the market, average out, and calculate what you’d make
-annually assuming there are 200 working days.
+Now, you might think, ok, let's just pick the close-based returns for the days on the market, average out, and calculate what you'd make annually assuming there are 200 working days.
 
 ``` r
 closeReturns  <- US500withSignal$closeRet[US500withSignal$signal == 1] 
@@ -167,10 +143,7 @@ closeReturns  <- US500withSignal$closeRet[US500withSignal$signal == 1]
 
     ## [1] 1.229147
 
-Wow, impressive, right? You’d make 22%\! Well, first off, the strategy
-would be expected to make you hold a position only a fraction of the
-time, namely, 31 days per year on average, so you need to recalculate
-your annual estimate.
+Wow, impressive, right? You'd make 22%! Well, first off, the strategy would be expected to make you hold a position only a fraction of the time, namely, 31 days per year on average, so you need to recalculate your annual estimate.
 
 ``` r
 mean(US500withSignal$signal)
@@ -190,8 +163,7 @@ mean(US500withSignal$signal) * 200
 
     ## [1] 1.032496
 
-This is slightly less impressive, unfortunately. Now, if you use open
-prices there is going to be a slight difference.
+This is slightly less impressive, unfortunately. Now, if you use open prices there is going to be a slight difference.
 
 ``` r
 returns  <- US500withSignal$ret[US500withSignal$signal == 1] 
@@ -208,8 +180,7 @@ returns  <- US500withSignal$ret[US500withSignal$signal == 1]
 
     ## [1] 1.032354
 
-Perhaps more concretely, you want to take a look at two equity curves.
-One for simply buying and holding and one for following your strategy.
+Perhaps more concretely, you want to take a look at two equity curves. One for simply buying and holding and one for following your strategy.
 
 ``` r
 equityHold <- numeric(nrow(US500withSignal))
@@ -229,13 +200,9 @@ ggplot()+geom_line(aes(x = 1: nrow(US500withSignal), y = equityHold))+
   theme_tufte()+xlab("day")+ylab("equity")+ggtitle("Equity curves", subtitle ="hold (black) vs.strategy (blue)")
 ```
 
-![](https://rfl-urbaniak.github.io/backtesting/images/equityCurves,%20options-1.png)<!-- -->
+![](https://rfl-urbaniak.github.io/backtesting/images/equityCurves,%20options-1.png)
 
-The result of your strategy is in blue. Note the flat lines: these are
-the times when your strategy stops you from being on the market. You
-avoid some drawdowns, but you also avoid making money on some strong
-positive trends. Crucially, the final equities for the two ways to
-proceed are:
+The result of your strategy is in blue. Note the flat lines: these are the times when your strategy stops you from being on the market. You avoid some drawdowns, but you also avoid making money on some strong positive trends. Crucially, the final equities for the two ways to proceed are:
 
 ``` r
 tail(equityHold,1)
@@ -249,24 +216,11 @@ tail(equityStrategy,1)
 
     ## [1] 1.446046
 
-But perhaps you’re not too worried, because you think that you can use
-your capital on some other markets for the idle days and so in the end
-your money would we working for you more than 15% of the time. Sure.
+But perhaps you're not too worried, because you think that you can use your capital on some other markets for the idle days and so in the end your money would we working for you more than 15% of the time. Sure.
 
-### Center your returns\!
+### Center your returns!
 
-So suppose what we care about is average daily returns and we’re not
-worried about how many days the strategy tells you to be on the market
-as long as its a fairly decent exposure time. Here is a problem. When
-you you looked at average returns, and these can be simply positive
-because the market went up over the years. The question is, whether your
-strategy would allow you to beat the market, and to evaluate this better
-you need to center the returns so that they average to zero and then
-look at what gain you’d expect from your strategy in terms of the
-centered returns, including using centered returns in statistical
-significance estmation (read on for details). So, by how much would you
-have beaten, expectedly, the market per year if you’re only using your
-resources for `US500`?
+So suppose what we care about is average daily returns and we're not worried about how many days the strategy tells you to be on the market as long as its a fairly decent exposure time. Here is a problem. When you you looked at average returns, and these can be simply positive because the market went up over the years. The question is, whether your strategy would allow you to beat the market, and to evaluate this better you need to center the returns so that they average to zero and then look at what gain you'd expect from your strategy in terms of the centered returns, including using centered returns in statistical significance estmation (read on for details). So, by how much would you have beaten, expectedly, the market per year if you're only using your resources for `US500`?
 
 ``` r
 returnsC  <- US500withSignal$retC[US500withSignal$signal == 1] 
@@ -282,10 +236,7 @@ returnsC  <- US500withSignal$retC[US500withSignal$signal == 1]
 
     ## [1] 1
 
-This, still is a bit of cheating as we repeatedly used the mean return
-in the calcuations instead of using all the centered returns that were
-used in the exposure. So, again, let’s look at `extra equity lines`
-which represent how you would stand compared to the market.
+This, still is a bit of cheating as we repeatedly used the mean return in the calcuations instead of using all the centered returns that were used in the exposure. So, again, let's look at `extra equity lines` which represent how you would stand compared to the market.
 
 ``` r
 equityHoldC <- numeric(nrow(US500withSignal))
@@ -305,7 +256,7 @@ ggplot()+geom_line(aes(x = 1: nrow(US500withSignal), y = equityHoldC))+
   theme_tufte()+xlab("day")+ylab("equity")+ggtitle("Extra equity curves", subtitle ="hold (black) vs.strategy (blue)")
 ```
 
-![](https://rfl-urbaniak.github.io/backtesting/images/equityCurvesTop,%20options-1.png)<!-- -->
+![](https://rfl-urbaniak.github.io/backtesting/images/equityCurvesTop,%20options-1.png)
 
 ``` r
 #compare mean daily returns:
@@ -320,11 +271,8 @@ mean(US500withSignal$retC) #zero with rounding errors
 
     ## [1] 7.857887e-20
 
-Ok. It doesn’t seem like you’re going to get rich soon, but at least
-this seems like progress, right? Right?
+Ok. It doesn't seem like you're going to get rich soon, but at least this seems like progress, right? Right?
 
 ### Comparison with random strategies
 
-Come to think of it, you only should think your strategy isn’t too bad
-if it does significantly better than just buying and selling on random
-days for the same number of days.
+Come to think of it, you only should think your strategy isn't too bad if it does significantly better than just buying and selling on random days for the same number of days.
