@@ -154,3 +154,25 @@ for (i in (lookback + 2):nrow(data)){
                       data$close[i] < data$ma[i])
     }
 ```
+
+
+
+
+For later use, it actually makes to define a function that does all this at once.
+
+``` r
+signal <- function (data, lookback = 20, multiplier = 1.5) {
+data$ma <- SMA(data$adjusted,lookback)
+data$runSD <- runSD(data$adjusted,lookback)
+data$signal <- numeric(nrow(data))
+for (i in (lookback + 2):nrow(data)){
+  data$signal[i] <- (data$close[i] >= data$ma[i] - multiplier * data$runSD[i] &
+                     data$close[i-1] < data$ma[i] - multiplier * data$runSD[i]) |
+                (data$signal[i-1] == 1 &  data$close[i] < data$ma[i])
+}
+return(data)
+}
+
+#add signal to US500
+US500withSignal <- signal(US500)
+```
