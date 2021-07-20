@@ -180,14 +180,10 @@ US500withSignal <- signal(US500)
 
 
 
-#  Don't just annualize expected daily returns
-
-Now, you might think, ok, let's just pick the close-based returns for the days on the market, average out, and calculate what you'd make annually assuming there are 200 working days.
 
 
 
-
-# Don't just annualize expected daily returns
+### Don't just annualize expected daily returns
 
 Now, you might think, ok, let's just pick the close-based returns for the days on the market, average out, and calculate what you'd make annually assuming there are 200 working days.
 
