@@ -4,7 +4,7 @@ title: Backtesting
 output:
   #  md_document:
   github_document:
-    pandoc_args: --mathjax
+    pandoc_args: --webtex
 #    variant: markdown_github
   preserve_yaml: true
 ---

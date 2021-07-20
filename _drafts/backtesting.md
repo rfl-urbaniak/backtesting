@@ -89,7 +89,7 @@ head(US500)
 
 ### Building signal
 
-Say you want to try out a fairly straightforward strategy, a variant of Bollinger bands. The idea is to buy if the price enters *m**a*-*m**u**l**t**i**p**l**i**e**r* × *r**u**n**S**D* from below, that is if crosses some multiplier of the running standard deviation down from the moving average. Suppose you're using the same time window to calculate them both. Further, assume you want to sell when the price reaches *m**a*, and that you're only interested in long positions, that is the signal is binary: 1 for holding a long position, 0 for not being on the market. Because we want to reuse the code to define a general function, it will be useful to rename the data as `data` for the time being. Suppose you think 20 days is good and that 1.5 is a decent multiplier.
+Say you want to try out a fairly straightforward strategy, a variant of Bollinger bands. The idea is to buy if the price enters ![ma](https://latex.codecogs.com/png.latex?ma "ma")-![multiplier\\times runSD](https://latex.codecogs.com/png.latex?multiplier%5Ctimes%20runSD "multiplier\times runSD") from below, that is if crosses some multiplier of the running standard deviation down from the moving average. Suppose you're using the same time window to calculate them both. Further, assume you want to sell when the price reaches ![ma](https://latex.codecogs.com/png.latex?ma "ma"), and that you're only interested in long positions, that is the signal is binary: 1 for holding a long position, 0 for not being on the market. Because we want to reuse the code to define a general function, it will be useful to rename the data as `data` for the time being. Suppose you think 20 days is good and that 1.5 is a decent multiplier.
 
 ``` r
 #this depends on two parameters

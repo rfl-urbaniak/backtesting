@@ -255,7 +255,9 @@ ggplot()+geom_line(aes(x = 1: nrow(US500withSignal), y = equityHold))+
 ```
 
 
-![](https://rfl-urbaniak.github.io/backtesting/images/equityCurves-1.png)
+<img src="https://rfl-urbaniak.github.io/backtesting/images/equityCurves-1.png" style="display: block; margin: auto;" />
+
+
 
 The result of your strategy is in blue. Note the flat lines: these are the times when your strategy stops you from being on the market. You avoid some drawdowns, but you also avoid making money on some strong positive trends. Crucially, the final equities for the two ways to proceed are:
 
