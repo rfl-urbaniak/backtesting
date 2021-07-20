@@ -372,3 +372,50 @@ sum(randomGains >= daily)/length(randomGains)
 ```
 
     ## [1] 0.0799
+
+
+Here's a more visual approach, where we plot extra equity curves including 20 random strategies:
+
+ ``` r
+ randomResults <- list()
+
+ n <- length(returnsC)
+ set.seed(123)
+ for(i in 1:20){
+ randomDays <- sample(2:nrow(US500withSignal),n)
+ randomReturns <- numeric(nrow(US500withSignal))
+ randomReturns[randomDays] <-  US500withSignal$retC[randomDays]
+
+ randomEquity <- numeric(nrow(US500withSignal))
+ randomEquity[1] <- 1
+ for (d in 2: nrow(US500withSignal)) {
+randomEquity[d] <- randomEquity[d-1] * (1+ randomReturns[d])
+ }
+ randomResults[[i]] <- randomEquity
+ }
+
+ ggplot()+geom_line(aes(x = 1: nrow(US500withSignal), y = equityHoldC))+
+geom_line(aes(x = 1: nrow(US500withSignal), y = equityStrategyC), col = "skyblue")+
+geom_line(aes(x = 1: nrow(US500withSignal), y = randomResults[[1]]), col = "gray")+
+geom_line(aes(x = 1: nrow(US500withSignal), y = randomResults[[2]]), col = "gray")+
+geom_line(aes(x = 1: nrow(US500withSignal), y = randomResults[[3]]), col = "gray")+
+geom_line(aes(x = 1: nrow(US500withSignal), y = randomResults[[4]]), col = "gray")+
+geom_line(aes(x = 1: nrow(US500withSignal), y = randomResults[[5]]), col = "gray")+
+geom_line(aes(x = 1: nrow(US500withSignal), y = randomResults[[6]]), col = "gray")+
+geom_line(aes(x = 1: nrow(US500withSignal), y = randomResults[[7]]), col = "gray")+
+geom_line(aes(x = 1: nrow(US500withSignal), y = randomResults[[8]]), col = "gray")+
+geom_line(aes(x = 1: nrow(US500withSignal), y = randomResults[[9]]), col = "gray")+
+geom_line(aes(x = 1: nrow(US500withSignal), y = randomResults[[11]]), col = "gray")+
+geom_line(aes(x = 1: nrow(US500withSignal), y = randomResults[[12]]), col = "gray")+
+geom_line(aes(x = 1: nrow(US500withSignal), y = randomResults[[13]]), col = "gray")+
+geom_line(aes(x = 1: nrow(US500withSignal), y = randomResults[[14]]), col = "gray")+
+geom_line(aes(x = 1: nrow(US500withSignal), y = randomResults[[15]]), col = "gray")+
+geom_line(aes(x = 1: nrow(US500withSignal), y = randomResults[[16]]), col = "gray")+
+geom_line(aes(x = 1: nrow(US500withSignal), y = randomResults[[17]]), col = "gray")+
+geom_line(aes(x = 1: nrow(US500withSignal), y = randomResults[[18]]), col = "gray")+
+geom_line(aes(x = 1: nrow(US500withSignal), y = randomResults[[19]]), col = "gray")+
+geom_line(aes(x = 1: nrow(US500withSignal), y = randomResults[[20]]), col = "gray")+
+theme_tufte()+xlab("day")+ylab("equity")+ggtitle("Extra equity curves including 20 random strategies", subtitle ="hold (black) vs. strategy (blue) random (gray)")
+ ```
+
+![](https://rfl-urbaniak.github.io/backtesting/images/randomEquities-1.png)
