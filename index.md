@@ -344,3 +344,31 @@ mean(US500withSignal$retC) #zero with rounding errors
     ## [1] 7.857887e-20
 
 Ok. It doesn't seem like you're going to get rich soon, but at least this seems like progress, right? Right?
+
+
+
+
+
+``` r
+set.seed(123)
+daily <- mean(returnsC)
+n <- length(returnsC)
+
+randomGains <- numeric(10000)
+for(i in 1:10000){
+randomDays <-   sample(US500withSignal$retC,n)
+randomGains[i] <- mean(randomDays)
+}
+
+
+ggplot()+geom_histogram(aes(x=randomGains), bins = 50)+geom_vline(xintercept = daily)+theme_tufte()+
+  labs(title = "Average daily gains for 10k random strategies", subtitle = "Average daily gain of your strategy marked with a vertical line")+xlab("daily gain")
+```
+
+![](https://rfl-urbaniak.github.io/backtesting/images/randomGains-1.png)
+
+``` r
+sum(randomGains >= daily)/length(randomGains)
+```
+
+    ## [1] 0.0799
