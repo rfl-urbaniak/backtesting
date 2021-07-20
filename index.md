@@ -279,3 +279,68 @@ tail(equityStrategy,1)
     ## [1] 1.446046
 
 But perhaps you're not too worried, because you think that you can use your capital on some other markets for the idle days and so in the end your money would we working for you more than 15% of the time. Sure.
+
+
+
+
+
+
+### Center your returns!
+
+So suppose what we care about is average daily returns and we're not worried about how many days the strategy tells you to be on the market as long as its a fairly decent exposure time.
+Here is a problem. When you you looked at average returns, and these can be simply positive because the market went up over the years. The question is, whether your strategy would allow you to beat the market, and to evaluate this better you need to center the returns so that they average to zero and then look at what gain you'd expect from your strategy in terms of the centered returns, including using centered returns in statistical significance estmation (read on for details).  So, by how much would  you have  beaten, expectedly, the market per year if you're only using your resources for `US500`?
+
+
+
+``` r
+returnsC  <- US500withSignal$retC[US500withSignal$signal == 1]
+(1+mean(returnsC))^31
+```
+
+    ## [1] 1.022951
+
+``` r
+#as compared to holding the whole year
+(1+mean(US500withSignal$retC))^200
+```
+
+    ## [1] 1
+
+This, still is a bit of cheating as we repeatedly used the mean return in the calcuations instead of using all the centered returns that were used in the exposure. So, again, let's look at `extra equity lines` which represent how you would stand compared to the market.
+
+
+
+``` r
+equityHoldC <- numeric(nrow(US500withSignal))
+equityHoldC[1] <- 1
+for (i in 2: nrow(US500withSignal)) {equityHoldC[i] <-
+                                    equityHoldC[i-1] * (1+ US500withSignal$retC[i])}
+
+
+returnsFullC  <- ifelse(US500withSignal$signal == 1, US500withSignal$retC,0)
+equityStrategyC <- numeric(nrow(US500withSignal))
+equityStrategyC[1] <- 1
+for (i in 2: nrow(US500withSignal)) {equityStrategyC[i] <-
+  equityStrategyC[i-1] * (1+ returnsFullC[i])}
+
+ggplot()+geom_line(aes(x = 1: nrow(US500withSignal), y = equityHoldC))+
+  geom_line(aes(x = 1: nrow(US500withSignal), y = equityStrategyC), col = "skyblue")+
+  theme_tufte()+xlab("day")+ylab("equity")+ggtitle("Extra equity curves", subtitle ="hold (black) vs.strategy (blue)")
+```
+
+![](https://rfl-urbaniak.github.io/backtesting/images/equityCurvesTop-1.png)
+
+``` r
+#compare mean daily returns:
+mean(returnsC)
+```
+
+    ## [1] 0.0007322492
+
+``` r
+mean(US500withSignal$retC) #zero with rounding errors
+```
+
+    ## [1] 7.857887e-20
+
+Ok. It doesn't seem like you're going to get rich soon, but at least this seems like progress, right? Right?
