@@ -255,7 +255,7 @@ ggplot()+geom_line(aes(x = 1: nrow(US500withSignal), y = equityHold))+
 ```
 
 
-<img src="https://rfl-urbaniak.github.io/backtesting/images/equityCurves-1.png" style="display: block; margin: auto;" />
+<img src="https://rfl-urbaniak.github.io/backtesting/images/equityCurves.png" style="display: block; margin: auto;" />
 
 
 

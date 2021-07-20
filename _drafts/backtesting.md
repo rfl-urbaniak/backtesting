@@ -187,7 +187,7 @@ equityHold <- numeric(nrow(US500withSignal))
 equityHold[1] <- 1
 for (i in 2: nrow(US500withSignal)) {equityHold[i] <-
                                     equityHold[i-1] * (1+ US500withSignal$ret[i])}
-
+  
 
 returnsFull  <- ifelse(US500withSignal$signal == 1, US500withSignal$ret,0)
 equityStrategy <- numeric(nrow(US500withSignal))
