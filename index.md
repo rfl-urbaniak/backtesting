@@ -129,7 +129,7 @@ head(US500)
 
 Say you want to try out a fairly straightforward strategy, a variant of Bollinger bands. The idea is to buy if the price enters
 
-$\mathsf{ma-multiplier}\times \mathsf{runSD}$
+$\mathsf{MAmultiplier}\times \mathsf{runSD}$
 
 from below, that is if crosses  some multiplier of the running standard deviation down from the moving average. Suppose you're using the same time window to calculate them both. Further, assume you want to sell when the price reaches $ma$, and that you're only interested in long positions, that is the signal is binary: 1 for holding a long position, 0 for not being on the market.  Because we want to reuse the code to define a general function, it will be useful to rename the data as `data` for the time being.
 Suppose you think 20 days is good and that 1.5 is a decent multiplier.
@@ -278,4 +278,4 @@ tail(equityStrategy,1)
 
     ## [1] 1.446046
 
-But perhaps you're not too worried, because you think that you can use your capital on some other markets for the idle days and so in the end your money would we working for you more than 15% of the time. Sure
+But perhaps you're not too worried, because you think that you can use your capital on some other markets for the idle days and so in the end your money would we working for you more than 15% of the time. Sure.

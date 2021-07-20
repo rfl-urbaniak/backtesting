@@ -256,7 +256,7 @@ ggplot()+geom_line(aes(x = 1: nrow(US500withSignal), y = equityHoldC))+
   theme_tufte()+xlab("day")+ylab("equity")+ggtitle("Extra equity curves", subtitle ="hold (black) vs.strategy (blue)")
 ```
 
-![](https://rfl-urbaniak.github.io/backtesting/images/equityCurvesTop,%20options-1.png)
+![](https://rfl-urbaniak.github.io/backtesting/images/equityCurvesTop-1.png)
 
 ``` r
 #compare mean daily returns:

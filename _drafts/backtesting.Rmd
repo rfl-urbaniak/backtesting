@@ -10,7 +10,8 @@ output:
 ---
 
 ```{r , echo = FALSE, eval = TRUE}
-knitr::opts_knit$set(base.dir = "/home/rafal/L2/L2projects/backtesting",
+#knitr::opts_knit$set(base.dir = "/home/rafal/L2/L2projects/backtesting",
+knitr::opts_knit$set(base.dir = "/home/rafal/UG/UGprojects/backtesting",
 base.url = "https://rfl-urbaniak.github.io/backtesting/")
 knitr::opts_chunk$set(fig.path = "images/")
 ```
@@ -208,7 +209,7 @@ returnsC  <- US500withSignal$retC[US500withSignal$signal == 1]
 This, still is a bit of cheating as we repeatedly used the mean return in the calcuations instead of using all the centered returns that were used in the exposure. So, again, let's look at `extra equity lines` which represent how you would stand compared to the market. 
 
 
-```{r equityCurvesTop, options}
+```{r equityCurvesTop}
 equityHoldC <- numeric(nrow(US500withSignal))
 equityHoldC[1] <- 1
 for (i in 2: nrow(US500withSignal)) {equityHoldC[i] <-
