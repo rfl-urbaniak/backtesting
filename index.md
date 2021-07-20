@@ -258,3 +258,22 @@ ggplot()+geom_line(aes(x = 1: nrow(US500withSignal), y = equityHold))+
 ![](https://rfl-urbaniak.github.io/backtesting/images/equityCurves-1.png)
 
 The result of your strategy is in blue. Note the flat lines: these are the times when your strategy stops you from being on the market. You avoid some drawdowns, but you also avoid making money on some strong positive trends. Crucially, the final equities for the two ways to proceed are:
+
+
+
+
+
+
+``` r
+tail(equityHold,1)
+```
+
+    ## [1] 1.869234
+
+``` r
+tail(equityStrategy,1)
+```
+
+    ## [1] 1.446046
+
+But perhaps you're not too worried, because you think that you can use your capital on some other markets for the idle days and so in the end your money would we working for you more than 15% of the time. Sure
