@@ -49,16 +49,8 @@ Next, get the most recent data on US500 (because I'll use it for the example), r
 
 
 
-```{r data, options, warning = FALSE, message = FALSE}
-getSymbols(Symbols = "^GSPC", src = "yahoo")
-US500 <- data.frame(GSPC)
-colnames(US500) <- c("open","high","low","close","vol","adjusted")
-head(US500)
-nrow(US500)
-US500full <- US500
-US500 <- US500[1:2800,]
-US500test <- US500full[2801:nrow(US500full),]
-```
+
+
 
 ``` r
 getSymbols(Symbols = "^GSPC", src = "yahoo")
@@ -137,3 +129,28 @@ head(US500)
 
 Say you want to try out a fairly straightforward strategy, a variant of Bollinger bands. The idea is to buy if the price enters  $ma$-$multiplier\times runSD$ from below, that is if crosses  some multiplier of the running standard deviation down from the moving average. Suppose you're using the same time window to calculate them both. Further, assume you want to sell when the price reaches $ma$, and that you're only interested in long positions, that is the signal is binary: 1 for holding a long position, 0 for not being on the market.  Because we want to reuse the code to define a general function, it will be useful to rename the data as `data` for the time being.
 Suppose you think 20 days is good and that 1.5 is a decent multiplier.
+
+
+
+
+``` r
+#this depends on two parameters
+data <- US500
+lookback <- 20 #window in days
+multiplier <- 1.5  #distance from the mean as measured in running sd
+
+data$ma <- SMA(data$adjusted,lookback) #moving average
+data$runSD <- runSD(data$adjusted,lookback) #running sd
+
+
+data$signal <- numeric(nrow(data))
+for (i in (lookback + 2):nrow(data)){
+    data$signal[i] <- (
+                      #either you're above the threshold today and were below it yesterday
+                      data$close[i] >= data$ma[i] - multiplier * data$runSD[i] &
+                      data$close[i-1] < data$ma[i] - multiplier * data$runSD[i]) |
+                      # or you're holding already, but still below the moving average
+                      (data$signal[i-1] == 1 &
+                      data$close[i] < data$ma[i])
+    }
+```
