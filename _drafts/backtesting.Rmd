@@ -158,7 +158,7 @@ returns  <- US500withSignal$ret[US500withSignal$signal == 1]
 
 Perhaps more concretely, you want to take a look at two equity curves. One for simply buying and holding and one for following your strategy.
 
-```{r equityCurves, options}
+```{r equityCurves}
 equityHold <- numeric(nrow(US500withSignal))
 equityHold[1] <- 1
 for (i in 2: nrow(US500withSignal)) {equityHold[i] <-

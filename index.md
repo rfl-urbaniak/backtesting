@@ -176,3 +176,85 @@ return(data)
 #add signal to US500
 US500withSignal <- signal(US500)
 ```
+
+
+
+#  Don't just annualize expected daily returns
+
+Now, you might think, ok, let's just pick the close-based returns for the days on the market, average out, and calculate what you'd make annually assuming there are 200 working days.
+
+
+
+
+# Don't just annualize expected daily returns
+
+Now, you might think, ok, let's just pick the close-based returns for the days on the market, average out, and calculate what you'd make annually assuming there are 200 working days.
+
+``` r
+closeReturns  <- US500withSignal$closeRet[US500withSignal$signal == 1]
+(1+mean(closeReturns))^200
+```
+
+    ## [1] 1.229147
+
+Wow, impressive, right? You'd make 22%! Well, first off, the strategy would be expected to make you hold a position only a fraction of the time, namely, 31 days per year on average, so you need to recalculate your annual estimate.
+
+``` r
+mean(US500withSignal$signal)
+```
+
+    ## [1] 0.1539286
+
+``` r
+mean(US500withSignal$signal) * 200
+```
+
+    ## [1] 30.78571
+
+``` r
+(1+mean(closeReturns))^31
+```
+
+    ## [1] 1.032496
+
+This is slightly less impressive, unfortunately. Now, if you use open prices there is going to be a slight difference.
+
+``` r
+returns  <- US500withSignal$ret[US500withSignal$signal == 1]
+#annualized
+(1+mean(returns))^200
+```
+
+    ## [1] 1.228051
+
+``` r
+#considering you'd be off the market most of the time
+(1+mean(returns))^31
+```
+
+    ## [1] 1.032354
+
+Perhaps more concretely, you want to take a look at two equity curves. One for simply buying and holding and one for following your strategy.
+
+``` r
+equityHold <- numeric(nrow(US500withSignal))
+equityHold[1] <- 1
+for (i in 2: nrow(US500withSignal)) {equityHold[i] <-
+                                    equityHold[i-1] * (1+ US500withSignal$ret[i])}
+
+
+returnsFull  <- ifelse(US500withSignal$signal == 1, US500withSignal$ret,0)
+equityStrategy <- numeric(nrow(US500withSignal))
+equityStrategy[1] <- 1
+for (i in 2: nrow(US500withSignal)) {equityStrategy[i] <-
+  equityStrategy[i-1] * (1+ returnsFull[i])}
+
+ggplot()+geom_line(aes(x = 1: nrow(US500withSignal), y = equityHold))+
+  geom_line(aes(x = 1: nrow(US500withSignal), y = equityStrategy), col = "skyblue")+
+  theme_tufte()+xlab("day")+ylab("equity")+ggtitle("Equity curves", subtitle ="hold (black) vs.strategy (blue)")
+```
+
+
+![](https://rfl-urbaniak.github.io/backtesting/images/equityCurves-1.png)
+
+The result of your strategy is in blue. Note the flat lines: these are the times when your strategy stops you from being on the market. You avoid some drawdowns, but you also avoid making money on some strong positive trends. Crucially, the final equities for the two ways to proceed are:
