@@ -466,7 +466,8 @@ for(i in 1:10000){
 }
 
 
-ggplot()+geom_histogram(aes(x=randomGainstest), bins = 50)+geom_vline(xintercept = daily)
+ggplot()+geom_histogram(aes(x=randomGainstest), bins = 50)+geom_vline(xintercept = daily)+theme_tufte()+
+  labs(title = "Average daily gains for 10k random strategies (test set)", subtitle = "Average daily gain of your strategy marked with a vertical line")+xlab("daily gain")
 ```
 
 ![](https://rfl-urbaniak.github.io/backtesting/images/randomEquities2-1.png)
