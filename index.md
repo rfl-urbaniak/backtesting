@@ -346,7 +346,9 @@ mean(US500withSignal$retC) #zero with rounding errors
 Ok. It doesn't seem like you're going to get rich soon, but at least this seems like progress, right? Right?
 
 
+### Comparing to random strategies
 
+To get a clearer picture, let's investigate whether the strategy does much better than just trading on random days, for the same number of days.
 
 
 ``` r
@@ -374,7 +376,7 @@ sum(randomGains >= daily)/length(randomGains)
     ## [1] 0.0799
 
 
-Here's a more visual approach, where we plot extra equity curves including 20 random strategies:
+This suggests that around 7% of random strategies would have done better than the carefully formulated one, and this casts some doubt on whether the latter is deeply superior.  Here's a more visual approach, where we plot extra equity curves including 20 random strategies:
 
  ``` r
  randomResults <- list()
@@ -419,3 +421,6 @@ theme_tufte()+xlab("day")+ylab("equity")+ggtitle("Extra equity curves including 
  ```
 
 ![](https://rfl-urbaniak.github.io/backtesting/images/randomEquities-1.png)
+
+
+Conceptual point: the extra equity curve illustrates what would have happened with your equity if the only returns were those above the marked progress tracked by what happens to the buying and holding strategy. For this reason, the buying and holding extra equity ends up lower than 1. After all, the mean of centered returns is 0. To take a simple example, say you only have consider two days with centered returns $(-0.1,0.1)$. The mean is zero, but the extra equity is $1\times 0.9 \times 1.1 = 0.99$. If you lose $10\%$, you need to gain more than $10\%$ of what you now have to get back to your original equity.
