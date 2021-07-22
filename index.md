@@ -346,7 +346,7 @@ mean(US500withSignal$retC) #zero with rounding errors
 Ok. It doesn't seem like you're going to get rich soon, but at least this seems like progress, right? Right?
 
 
-### Comparing to random strategies
+### Comparison to random strategies
 
 To get a clearer picture, let's investigate whether the strategy does much better than just trading on random days, for the same number of days.
 
@@ -424,3 +424,119 @@ theme_tufte()+xlab("day")+ylab("equity")+ggtitle("Extra equity curves including 
 
 
 Conceptual point: the extra equity curve illustrates what would have happened with your equity if the only returns were those above the marked progress tracked by what happens to the buying and holding strategy. For this reason, the buying and holding extra equity ends up lower than 1. After all, the mean of centered returns is 0. To take a simple example, say you only have consider two days with centered returns $(-0.1,0.1)$. The mean is zero, but the extra equity is $1\times 0.9 \times 1.1 = 0.99$. If you lose $10\%$, you need to gain more than $10\%$ of what you now have to get back to your original equity.
+
+
+
+### Evaluation using the test set
+
+
+
+Now, let's run the same analysis on the test data.
+
+``` r
+US500test$ret <- numeric(nrow(US500test))
+for(r in 1:nrow(US500test)){
+  US500test$ret[r] <- (US500test$open[r+2]/US500test$open[r+1])-1
+}
+US500test$ret[(nrow(US500test)-1):nrow(US500test)] <- rep(0,2)
+US500test$retC <- US500test$ret - mean(US500test$ret, na.rm=TRUE)
+
+US500test <- signal(US500test)
+returnsCtest  <- US500test$retC[US500test$signal == 1]
+
+annualOnMarketTest <- round(length(returnsCtest)/nrow(US500test) *200)
+
+#expected improvement annualized
+(1+mean(returnsCtest))^annualOnMarketTest
+```
+
+    ## [1] 1.006072
+
+``` r
+#now comparison with random strategies
+set.seed(123)
+daily <- mean(returnsCtest)
+
+n <- length(returnsCtest)
+
+randomGainstest <- numeric(10000)
+for(i in 1:10000){
+  randomDaystest <-   sample(US500test$retC,n)
+  randomGainstest[i] <- mean(randomDaystest)
+}
+
+
+ggplot()+geom_histogram(aes(x=randomGainstest), bins = 50)+geom_vline(xintercept = daily)
+```
+
+![](https://rfl-urbaniak.github.io/backtesting/images/randomEquities2-1.png)
+
+``` r
+#what's the relative frequency of random strategies that do better?
+sum(randomGainstest >= daily)/length(randomGainstest)
+```
+
+    ## [1] 0.4184
+
+We can also plot extra equities for our strategy, buying and holding, and a bunch of random equities.
+
+``` r
+randomResultstest <- list()
+
+n <- length(returnsCtest)
+set.seed(123)
+for(i in 1:20){
+randomDaystest <- sample(2:nrow(US500test),n)
+randomReturnstest <- numeric(nrow(US500test))
+randomReturnstest[randomDaystest] <-  US500test$retC[randomDaystest]
+
+randomEquitytest <- numeric(nrow(US500test))
+randomEquitytest[1] <- 1
+for (d in 2: nrow(US500test)) {
+  randomEquitytest[d] <- randomEquitytest[d-1] * (1+ randomReturnstest[d])
+}
+randomResultstest[[i]] <- randomEquitytest
+}
+
+equityHoldCtest <- numeric(nrow(US500test))
+equityHoldCtest[1] <- 1
+for (i in 2: nrow(US500test)) {equityHoldCtest[i] <-
+                                    equityHoldCtest[i-1] * (1+ US500test$retC[i])}
+
+returnsFullCtest  <- ifelse(US500test$signal == 1, US500test$retC,0)
+
+equityStrategyCtest <- numeric(nrow(US500test))
+equityStrategyCtest[1] <- 1
+for (i in 2: nrow(US500test)) {equityStrategyCtest[i] <-
+  equityStrategyCtest[i-1] * (1+ returnsFullCtest[i])}
+
+
+
+ggplot()+geom_line(aes(x = 1: nrow(US500test), y = equityHoldCtest))+
+  geom_line(aes(x = 1: nrow(US500test), y = equityStrategyCtest), col = "skyblue")+
+  geom_line(aes(x = 1: nrow(US500test), y = randomResultstest[[1]]), col = "gray")+
+  geom_line(aes(x = 1: nrow(US500test), y = randomResultstest[[2]]), col = "gray")+
+  geom_line(aes(x = 1: nrow(US500test), y = randomResultstest[[3]]), col = "gray")+
+  geom_line(aes(x = 1: nrow(US500test), y = randomResultstest[[4]]), col = "gray")+
+  geom_line(aes(x = 1: nrow(US500test), y = randomResultstest[[5]]), col = "gray")+
+  geom_line(aes(x = 1: nrow(US500test), y = randomResultstest[[6]]), col = "gray")+
+  geom_line(aes(x = 1: nrow(US500test), y = randomResultstest[[7]]), col = "gray")+
+  geom_line(aes(x = 1: nrow(US500test), y = randomResultstest[[8]]), col = "gray")+
+  geom_line(aes(x = 1: nrow(US500test), y = randomResultstest[[9]]), col = "gray")+
+  geom_line(aes(x = 1: nrow(US500test), y = randomResultstest[[11]]), col = "gray")+
+  geom_line(aes(x = 1: nrow(US500test), y = randomResultstest[[12]]), col = "gray")+
+  geom_line(aes(x = 1: nrow(US500test), y = randomResultstest[[13]]), col = "gray")+
+  geom_line(aes(x = 1: nrow(US500test), y = randomResultstest[[14]]), col = "gray")+
+  geom_line(aes(x = 1: nrow(US500test), y = randomResultstest[[15]]), col = "gray")+
+  geom_line(aes(x = 1: nrow(US500test), y = randomResultstest[[16]]), col = "gray")+
+  geom_line(aes(x = 1: nrow(US500test), y = randomResultstest[[17]]), col = "gray")+
+  geom_line(aes(x = 1: nrow(US500test), y = randomResultstest[[18]]), col = "gray")+
+  geom_line(aes(x = 1: nrow(US500test), y = randomResultstest[[19]]), col = "gray")+
+  geom_line(aes(x = 1: nrow(US500test), y = randomResultstest[[20]]), col = "gray")+
+  theme_tufte()+xlab("day")+ylab("equity")+ggtitle("Extra equity curves including 20 random strategies (test set)", subtitle ="hold (black) vs. strategy (blue) random (gray)")
+```
+
+![](https://rfl-urbaniak.github.io/backtesting/images/randomEquities3-1.png)
+
+
+Are you still impressed?
