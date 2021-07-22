@@ -458,3 +458,119 @@ ggplot()+geom_line(aes(x = 1: nrow(US500test), y = equityHoldCtest))+
 ```
 
 ![](https://rfl-urbaniak.github.io/backtesting/images/randomEquities3-1.png)
+
+### Optimization
+
+But hey, maybe the signaling parameters weren't too good. Let's try to optimize them.
+
+``` r
+#create table with candidates
+lookbackOptions <- c(9,15,18,20,22,25) 
+multiplierOptions <- c(2.1,2,1.9,1.8,1.7,1.6,1.5)
+
+options <- expand.grid(lookbackOptions,multiplierOptions)
+colnames(options) <- c("lookbackOptions","multiplierOptions")
+
+#note there are quite a few, so the computation might take a bit
+nrow(options)
+```
+
+    ## [1] 42
+
+``` r
+#let's calculate avg daily gains for each of this signaling strategies
+#this might take a while
+options$dailyGains <- numeric(nrow(options))
+
+for (option in 1: nrow(options)){
+
+  US500new <- signal(US500, lookback = options$lookbackOptions[option], 
+                            multiplier = options$multiplierOptions[option])
+
+  newGains <- US500new$retC[US500new$signal == 1] 
+  
+  options$dailyGains[option] <- mean(newGains)
+}
+
+#and let's sort them to have the best ones on top
+optionsSorted <- options[order(options$dailyGains, decreasing = TRUE),]
+
+#inspect
+head(optionsSorted)
+```
+
+    ##    lookbackOptions multiplierOptions   dailyGains
+    ## 30              25               1.7 0.0010182723
+    ## 25               9               1.7 0.0010109784
+    ## 26              15               1.7 0.0009911704
+    ## 12              25               2.0 0.0008912633
+    ## 35              22               1.6 0.0008378764
+    ## 18              25               1.9 0.0008199543
+
+``` r
+#how does the best option do?
+topDaily <- optionsSorted[1,3]
+
+topDaily/daily
+```
+
+    ## [1] 5.381827
+
+Woah, that's more than five times better than the old one, right? so you're like, aha, let's use lookback 25 and multiplier 1.7!
+
+### Testing the optimized strategy
+
+What happens when you compare this to random strategies? You might be inlined to simply repeat the previous analysis:
+
+``` r
+#plug it in
+US500optimal <- signal(US500, lookback = 25, multiplier = 1.7)
+returnsCoptimal  <- US500optimal$retC[US500optimal$signal == 1] 
+GAIN <- mean(returnsCoptimal)
+GAIN
+```
+
+    ## [1] 0.001018272
+
+``` r
+ggplot()+geom_histogram(aes(x=randomGains), bins = 50)+geom_vline(xintercept = GAIN)+theme_tufte()+
+  labs(title = "Average daily gains for 10k random strategies", subtitle = "Average daily gain of the optimal strategy marked with a vertical line")+xlab("daily gain")
+```
+
+![](https://rfl-urbaniak.github.io/backtesting/images/optimization2-1.png)
+
+``` r
+sum(randomGains >= GAIN)/length(randomGains)
+```
+
+    ## [1] 0.0245
+
+Right on! Now your strategy is better than around ![98\\%](https://latex.codecogs.com/png.latex?98%5C%25 "98\%") random strategies, which seems pretty cool!
+
+But wait. Note that this time you tested 42 different strategies and chose the best one, so you need to correct for multiple testing. Your bootstrapping evaluation should mimic this. So instead of comparison to a bunch of random stragies, you should every time get 42 random strategies and pick the best one as a potential candidate. Like this:
+
+``` r
+randomGainsMax42 <- numeric(10000)
+for(g in 1:10000){
+    group <- numeric(42)
+    for (s in 1:42){
+      randomDays <-   sample(US500optimal$retC,n)
+      group[s] <-     mean(randomDays)
+      randomGainsMax42[g] <- max(group)
+          }
+}
+
+
+ggplot()+geom_histogram(aes(x=randomGainsMax42), bins = 50)+geom_vline(xintercept = GAIN)+theme_tufte()+
+  labs(title = "Average daily gains for 10k random strategies (multiple testing correction)", subtitle = "Average daily gain of the optimal strategy marked with a vertical line")+xlab("daily gain")
+```
+
+![](https://rfl-urbaniak.github.io/backtesting/images/optimization3-1.png)
+
+``` r
+sum(randomGainsMax42 > GAIN)/length(randomGainsMax42)
+```
+
+    ## [1] 0.9984
+
+This is slightly less impressive. If instead of coming up with a meticulous list of potential parameter combinations and optimizing, you simply randomly generated 42 random strategies, the best of those would around ![99\\%](https://latex.codecogs.com/png.latex?99%5C%25 "99\%") of the time do better than the one you obtained by optimizing. Huh.
