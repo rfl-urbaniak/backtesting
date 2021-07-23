@@ -635,6 +635,7 @@ Right on! Now your strategy is better than around ![98\\%](https://latex.codecog
 But wait. Note that this time you tested 42 different strategies and chose the best one, so you need to correct for multiple testing. Your bootstrapping evaluation should mimic this. So instead of comparison to a bunch of random stragies, you should every time get 42 random strategies and pick the best one as a potential candidate. Like this:
 
 ``` r
+n <- length(returnsCoptimal)
 randomGainsMax42 <- numeric(10000)
 for(g in 1:10000){
     group <- numeric(42)
