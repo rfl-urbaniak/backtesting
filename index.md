@@ -659,5 +659,7 @@ sum(randomGainsMax42 > GAIN)/length(randomGainsMax42)
 
     ## [1] 0.7338
 
-This is slightly less impressive. If instead of coming up with a meticulous list of potential parameter combinations and optimizing, you simply randomly generated 42 random strategies, the best of those would around ![73\\%](https://latex.codecogs.com/png.latex?99%5C%25 "73\%") of the time do better than the one you obtained by optimizing. Huh.
+This is slightly less impressive. If instead of coming up with a meticulous list of potential parameter combinations and optimizing, you simply randomly generated 42 random strategies, the best of those would around $73\%$ of the time do better than the one you obtained by optimizing. Huh.
+
+
 <!-- Z kwestii formalnych na szybko to 1. Trzeba sprawdzić jak łatwo jest wyszukać z Googla artykuł bo wygląda super więc warto gdyby łatwo byłoby go znaleźć 2. Nie myślałeś o publikacji na jakimś portalu z takimi wpisami jak medium? Myślę że byłby doceniony bardzo bo dobra jakość nie jest częsta ostatnio 3. Na dole brakuje sekcji z komentarzami (na telefonie przynajmniej nie widzę) gdyby ktoś zauważył błąd albo chciał o coś dopytać. 4. Później na spokojnie jeszcze przejrze 5. Na takich stronach jak medium często na początku artykułu jest obrazek nawiązujący do tematu, który pobudza wyobraźnię, są strony z bezplatnymi zdjęciami jak da się autorom credits. To coś takiego dodatkowego co mi przyszło.-->
