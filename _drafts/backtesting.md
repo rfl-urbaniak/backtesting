@@ -43,7 +43,7 @@ head(US500)
 nrow(US500)
 ```
 
-    ## [1] 3663
+    ## [1] 3664
 
 ``` r
 US500full <- US500
@@ -370,7 +370,7 @@ annualOnMarketTest <- round(length(returnsCtest)/nrow(US500test) *200)
 (1+mean(returnsCtest))^annualOnMarketTest
 ```
 
-    ## [1] 1.006072
+    ## [1] 1.005835
 
 ``` r
 #now comparison with random strategies
@@ -397,7 +397,7 @@ ggplot()+geom_histogram(aes(x=randomGainstest), bins = 50)+geom_vline(xintercept
 sum(randomGainstest >= daily)/length(randomGainstest)
 ```
 
-    ## [1] 0.4184
+    ## [1] 0.4198
 
 We can also plot extra equities for our strategy, buying and holding, and a bunch of random equities.
 
@@ -514,7 +514,7 @@ topDaily <- optionsSorted[1,3]
 topDaily/daily
 ```
 
-    ## [1] 5.381827
+    ## [1] 5.599768
 
 Woah, that's more than five times better than the old one, right? so you're like, aha, let's use lookback 25 and multiplier 1.7!
 
@@ -550,6 +550,8 @@ Right on! Now your strategy is better than around ![98\\%](https://latex.codecog
 But wait. Note that this time you tested 42 different strategies and chose the best one, so you need to correct for multiple testing. Your bootstrapping evaluation should mimic this. So instead of comparison to a bunch of random stragies, you should every time get 42 random strategies and pick the best one as a potential candidate. Like this:
 
 ``` r
+set.seed(999)
+n <- length(returnsCoptimal)
 randomGainsMax42 <- numeric(10000)
 for(g in 1:10000){
     group <- numeric(42)
@@ -571,6 +573,6 @@ ggplot()+geom_histogram(aes(x=randomGainsMax42), bins = 50)+geom_vline(xintercep
 sum(randomGainsMax42 > GAIN)/length(randomGainsMax42)
 ```
 
-    ## [1] 0.9984
+    ## [1] 0.7338
 
 This is slightly less impressive. If instead of coming up with a meticulous list of potential parameter combinations and optimizing, you simply randomly generated 42 random strategies, the best of those would around ![99\\%](https://latex.codecogs.com/png.latex?99%5C%25 "99\%") of the time do better than the one you obtained by optimizing. Huh.
