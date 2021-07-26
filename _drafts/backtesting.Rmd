@@ -506,5 +506,5 @@ ggplot()+geom_histogram(aes(x=randomGainsMax42), bins = 50)+geom_vline(xintercep
 sum(randomGainsMax42 > GAIN)/length(randomGainsMax42)
 ```
 
-This is slightly less impressive. If instead of coming up with a meticulous list of potential parameter combinations and optimizing, you simply randomly generated 42 random strategies, the best of those would around $99\%$ of the time do better than the one you obtained by optimizing. Huh. 
+This is slightly less impressive. If instead of coming up with a meticulous list of potential parameter combinations and optimizing, you simply randomly generated 42 random strategies, the best of those would around $73\%$ of the time do better than the one you obtained by optimizing. Huh. 
 

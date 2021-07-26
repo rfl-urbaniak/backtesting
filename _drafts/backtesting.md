@@ -108,7 +108,7 @@ for (i in (lookback + 2):nrow(data)){
                       data$close[i] >= data$ma[i] - multiplier * data$runSD[i] &
                       data$close[i-1] < data$ma[i] - multiplier * data$runSD[i]) |
                       # or you're holding already, but still below the moving average
-                      (data$signal[i-1] == 1 & 
+                      (data$signal[i-1] == 1 &
                       data$close[i] < data$ma[i])
     }
 ```
@@ -116,7 +116,7 @@ for (i in (lookback + 2):nrow(data)){
 For later use, it actually makes to define a function that does all this at once.
 
 ``` r
-signal <- function (data, lookback = 20, multiplier = 1.5) { 
+signal <- function (data, lookback = 20, multiplier = 1.5) {
 data$ma <- SMA(data$adjusted,lookback)
 data$runSD <- runSD(data$adjusted,lookback)
 data$signal <- numeric(nrow(data))
@@ -137,7 +137,7 @@ US500withSignal <- signal(US500)
 Now, you might think, ok, let's just pick the close-based returns for the days on the market, average out, and calculate what you'd make annually assuming there are 200 working days.
 
 ``` r
-closeReturns  <- US500withSignal$closeRet[US500withSignal$signal == 1] 
+closeReturns  <- US500withSignal$closeRet[US500withSignal$signal == 1]
 (1+mean(closeReturns))^200
 ```
 
@@ -166,7 +166,7 @@ mean(US500withSignal$signal) * 200
 This is slightly less impressive, unfortunately. Now, if you use open prices there is going to be a slight difference.
 
 ``` r
-returns  <- US500withSignal$ret[US500withSignal$signal == 1] 
+returns  <- US500withSignal$ret[US500withSignal$signal == 1]
 #annualized
 (1+mean(returns))^200
 ```
@@ -187,7 +187,7 @@ equityHold <- numeric(nrow(US500withSignal))
 equityHold[1] <- 1
 for (i in 2: nrow(US500withSignal)) {equityHold[i] <-
                                     equityHold[i-1] * (1+ US500withSignal$ret[i])}
-  
+
 
 returnsFull  <- ifelse(US500withSignal$signal == 1, US500withSignal$ret,0)
 equityStrategy <- numeric(nrow(US500withSignal))
@@ -223,7 +223,7 @@ But perhaps you're not too worried, because you think that you can use your capi
 So suppose what we care about is average daily returns and we're not worried about how many days the strategy tells you to be on the market as long as its a fairly decent exposure time. Here is a problem. When you you looked at average returns, and these can be simply positive because the market went up over the years. The question is, whether your strategy would allow you to beat the market, and to evaluate this better you need to center the returns so that they average to zero and then look at what gain you'd expect from your strategy in terms of the centered returns, including using centered returns in statistical significance estmation (read on for details). So, by how much would you have beaten, expectedly, the market per year if you're only using your resources for `US500`?
 
 ``` r
-returnsC  <- US500withSignal$retC[US500withSignal$signal == 1] 
+returnsC  <- US500withSignal$retC[US500withSignal$signal == 1]
 (1+mean(returnsC))^31
 ```
 
@@ -279,7 +279,7 @@ Come to think of it, you only should think your strategy isn't too bad if it doe
 
 ``` r
 set.seed(123)
-daily <- mean(returnsC) 
+daily <- mean(returnsC)
 n <- length(returnsC)
 
 randomGains <- numeric(10000)
@@ -362,7 +362,7 @@ US500test$ret[(nrow(US500test)-1):nrow(US500test)] <- rep(0,2)
 US500test$retC <- US500test$ret - mean(US500test$ret, na.rm=TRUE)
 
 US500test <- signal(US500test)
-returnsCtest  <- US500test$retC[US500test$signal == 1] 
+returnsCtest  <- US500test$retC[US500test$signal == 1]
 
 annualOnMarketTest <- round(length(returnsCtest)/nrow(US500test) *200)
 
@@ -375,7 +375,7 @@ annualOnMarketTest <- round(length(returnsCtest)/nrow(US500test) *200)
 ``` r
 #now comparison with random strategies
 set.seed(123)
-daily <- mean(returnsCtest) 
+daily <- mean(returnsCtest)
 
 n <- length(returnsCtest)
 
@@ -465,7 +465,7 @@ But hey, maybe the signaling parameters weren't too good. Let's try to optimize 
 
 ``` r
 #create table with candidates
-lookbackOptions <- c(9,15,18,20,22,25) 
+lookbackOptions <- c(9,15,18,20,22,25)
 multiplierOptions <- c(2.1,2,1.9,1.8,1.7,1.6,1.5)
 
 options <- expand.grid(lookbackOptions,multiplierOptions)
@@ -484,11 +484,11 @@ options$dailyGains <- numeric(nrow(options))
 
 for (option in 1: nrow(options)){
 
-  US500new <- signal(US500, lookback = options$lookbackOptions[option], 
+  US500new <- signal(US500, lookback = options$lookbackOptions[option],
                             multiplier = options$multiplierOptions[option])
 
-  newGains <- US500new$retC[US500new$signal == 1] 
-  
+  newGains <- US500new$retC[US500new$signal == 1]
+
   options$dailyGains[option] <- mean(newGains)
 }
 
@@ -525,7 +525,7 @@ What happens when you compare this to random strategies? You might be inlined to
 ``` r
 #plug it in
 US500optimal <- signal(US500, lookback = 25, multiplier = 1.7)
-returnsCoptimal  <- US500optimal$retC[US500optimal$signal == 1] 
+returnsCoptimal  <- US500optimal$retC[US500optimal$signal == 1]
 GAIN <- mean(returnsCoptimal)
 GAIN
 ```
@@ -575,4 +575,4 @@ sum(randomGainsMax42 > GAIN)/length(randomGainsMax42)
 
     ## [1] 0.7338
 
-This is slightly less impressive. If instead of coming up with a meticulous list of potential parameter combinations and optimizing, you simply randomly generated 42 random strategies, the best of those would around ![99\\%](https://latex.codecogs.com/png.latex?99%5C%25 "99\%") of the time do better than the one you obtained by optimizing. Huh.
+This is slightly less impressive. If instead of coming up with a meticulous list of potential parameter combinations and optimizing, you simply randomly generated 42 random strategies, the best of those would around ![73\\%](https://latex.codecogs.com/png.latex?99%5C%25 "73\%") of the time do better than the one you obtained by optimizing. Huh.
